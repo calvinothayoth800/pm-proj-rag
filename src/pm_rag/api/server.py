@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pm_rag.core.retrieval.retriever import retrieve
-from pm_rag.core.compliance.classifier import classify_query_intent
+from pm_rag.core.compliance.classifier import classify_query_intent, detect_sensitive_data
 from pm_rag.core.answering.generator import generate_answer
 from pm_rag.core.answering.formatter import format_final_response
 
@@ -28,10 +28,20 @@ def chat_endpoint(request: QueryRequest):
     if not query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
-    # 1. Classify Intent
+    # 1. Check for sensitive data first
+    has_sensitive, pattern = detect_sensitive_data(query)
+    if has_sensitive:
+        return QueryResponse(
+            answer="I cannot provide personal or sensitive information. I can only answer factual questions about mutual funds.",
+            source_url="",
+            last_updated="",
+            intent="sensitive_data"
+        )
+    
+    # 2. Classify Intent
     intent = classify_query_intent(query)
     
-    # 2. Handle compliance
+    # 3. Handle compliance refusals
     if intent in ["investment_advice", "comparison", "ranking", "return_projection", "performance_calculation"]:
         return QueryResponse(
             answer="I cannot provide investment advice, comparisons, or projections. I can only answer factual questions about mutual funds.",
@@ -40,13 +50,13 @@ def chat_endpoint(request: QueryRequest):
             intent=intent
         )
 
-    # 3. Retrieve
+    # 4. Retrieve
     chunks = retrieve(query, top_k=5)
     
-    # 4. Generate Answer
+    # 5. Generate Answer
     raw_answer, src_url, last_checked = generate_answer(query, chunks)
     
-    # 5. Format to exact contract
+    # 6. Format to exact contract
     final_text = format_final_response(raw_answer, src_url, last_checked)
     
     return QueryResponse(
