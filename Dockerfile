@@ -1,9 +1,10 @@
 FROM python:3.11-slim
 
-# Cache buster - change this to force rebuild
-ARG CACHE_BUST=20240614-3
-
 WORKDIR /app
+
+# Cache buster - must be USED in RUN to invalidate Docker cache
+ARG CACHE_BUST=20240614-4
+RUN echo "Cache bust: $CACHE_BUST"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \

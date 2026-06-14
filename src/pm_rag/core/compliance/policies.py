@@ -28,6 +28,8 @@ SENSITIVE_DATA_PATTERNS = [
     "pan",
     "aadhaar",
     "account number",
+    "account balance",
+    "my account",
     "otp",
     "password",
     "email",
