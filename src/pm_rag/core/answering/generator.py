@@ -23,6 +23,53 @@ _FUND_PATTERNS = [
 ]
 
 
+# Fallback: extract answer from chunks when LLM fails
+_FALLBACK_PATTERNS = {
+    "expense": re.compile(r'expense\s+ratio[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
+    "ratio": re.compile(r'(?:expense|fee|charge)[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
+    "sip": re.compile(r'(?:minimum|minimum\s+SIP|SIP\s+Investment)[^.]*₹\s*\d+', re.IGNORECASE),
+    "minimum": re.compile(r'(?:minimum|smallest)[^.]*₹\s*\d+', re.IGNORECASE),
+    "exit": re.compile(r'exit\s+load[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
+    "load": re.compile(r'(?:exit|redemption)[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
+    "lock": re.compile(r'lock[- ]?in\s+period[^.]*\d+\s*(?:year|month)', re.IGNORECASE),
+    "risk": re.compile(r'(?:risk|riskometer)[^.]*\b(?:Low|Moderate|High|Very High)\b', re.IGNORECASE),
+    "benchmark": re.compile(r'benchmark[^.]*\b[A-Z][^.,]+(?:Index|index)', re.IGNORECASE),
+    "type": re.compile(r'(?:type|category|classified)[^.]*\b(?:Equity|Debt|Hybrid|Mid Cap|Large Cap|Small Cap)\b', re.IGNORECASE),
+}
+
+
+def _extract_from_chunks(query: str, chunks: List[Dict]) -> str:
+    """Extract answer from chunks when LLM returns 'not found'."""
+    query_lower = query.lower()
+    
+    # Find matching pattern based on query keywords
+    for keyword, pattern in _FALLBACK_PATTERNS.items():
+        if keyword in query_lower:
+            # Search all chunks for matching sentence
+            for chunk in chunks:
+                text = chunk.get("text", "")
+                match = pattern.search(text)
+                if match:
+                    # Return the matched sentence (clean it up)
+                    sentence = match.group(0).strip()
+                    # Ensure it's a complete sentence
+                    if not sentence.endswith("."):
+                        # Find the end of the sentence
+                        end = text.find(".", match.end())
+                        if end != -1:
+                            sentence = text[match.start():end+1]
+                    return sentence
+    
+    # Generic fallback: return first sentence of top chunk
+    if chunks:
+        text = chunks[0].get("text", "")
+        sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', text) if s.strip()]
+        if sentences:
+            return sentences[0]
+    
+    return ""
+
+
 def _match_source_url(answer: str, chunks: List[Dict]) -> Tuple[str, str]:
     """Match the fund mentioned in the answer to the correct source URL.
     
@@ -75,6 +122,12 @@ def generate_answer(query: str, retrieved_chunks: List[Dict]) -> Tuple[str, str,
             raw_answer = completion.choices[0].message.content
         except Exception as e:
             raw_answer = f"Error during generation: {str(e)}"
+    
+    # If LLM returned "not found", try extracting from chunks directly
+    if "information not found" in raw_answer.lower() or "not found" in raw_answer.lower():
+        extracted = _extract_from_chunks(query, retrieved_chunks)
+        if extracted:
+            raw_answer = extracted
     
     # Match source URL to the fund mentioned in the answer
     source_url, last_checked = _match_source_url(raw_answer, retrieved_chunks)
