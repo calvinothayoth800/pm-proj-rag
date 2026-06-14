@@ -1,0 +1,81 @@
+name: Scheduled Corpus Refresh
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC.
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-corpus:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+
+    - name: Run ingestion pipeline
+      run: |
+        echo "Fetching latest data from corpus URLs..."
+        python scripts/ingest.py
+
+    - name: Rebuild FAISS index
+      run: |
+        echo "Rebuilding FAISS vector index..."
+        python scripts/build_index.py
+
+    - name: Run tests
+      run: |
+        echo "Running test suite..."
+        python -m unittest discover -s tests -v
+
+    - name: Stage refreshed artifacts
+      id: git-check
+      run: |
+        git add data/processed/chunks-latest.json
+        git add data/processed/provenance-latest.json
+        git add data/indexes/faiss_index.bin
+        git add data/indexes/index.json
+        git add data/indexes/metadata.json
+
+        if [ -f "docs/handoff.md" ]; then
+          sed -i "s/Latest run:.*/Latest run: $(date +%Y%m%d%H%M%S);/" docs/handoff.md
+          git add docs/handoff.md
+        fi
+
+        if git diff --staged --quiet; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "No changes detected in corpus artifacts"
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "Corpus artifacts updated"
+        fi
+
+    - name: Commit and push changes
+      if: steps.git-check.outputs.has_changes == 'true'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git commit -m "Auto-refresh corpus artifacts ($(date +%Y-%m-%d))"
+        git push
+
+    - name: Summary
+      run: |
+        echo "## Corpus Refresh Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- Refresh Date: $(date +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+        echo "- Updated: ${{ steps.git-check.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Next Scheduled: Next Monday 00:00 UTC" >> $GITHUB_STEP_SUMMARY

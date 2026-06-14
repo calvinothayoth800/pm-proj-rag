@@ -1,0 +1,48 @@
+# Virtual environment (877 MB!)
+.venv/
+venv/
+
+# Data directories (will be built during deployment)
+data/raw/
+data/processed/
+data/indexes/
+
+# Git LFS tracking (not needed)
+.gitattributes
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Test files
+run_manual_tests.py
+test_results.json
+audit_*.py
+
+# Docs (not needed for deployment)
+docs/
+UPGRADE_SUMMARY.md
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_STATUS.md
+TESTING_GUIDE.md
+
+# Lock files
+uv.lock
+poetry.lock
+
+# Environment files (HF Spaces uses Secrets)
+.env
+.env.example
+
+# Deployment scripts (not needed in container)
+DEPLOY.bat
+DEPLOY.ps1

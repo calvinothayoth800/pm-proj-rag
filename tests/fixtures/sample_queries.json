@@ -1,0 +1,126 @@
+{
+  "factual_allowed": [
+    {
+      "query": "What is the expense ratio for HDFC Mid Cap Fund?",
+      "expected_intent": "expense_ratio",
+      "should_allow": true
+    },
+    {
+      "query": "What is the exit load?",
+      "expected_intent": "exit_load",
+      "should_allow": true
+    },
+    {
+      "query": "What is the minimum SIP amount?",
+      "expected_intent": "minimum_sip",
+      "should_allow": true
+    },
+    {
+      "query": "What is the lock-in period for ELSS?",
+      "expected_intent": "lock_in_period",
+      "should_allow": true
+    },
+    {
+      "query": "What is the risk level of HDFC Focused Fund?",
+      "expected_intent": "riskometer",
+      "should_allow": true
+    },
+    {
+      "query": "What is the benchmark index?",
+      "expected_intent": "benchmark",
+      "should_allow": true
+    },
+    {
+      "query": "How to download tax statement?",
+      "expected_intent": "document_download",
+      "should_allow": true
+    }
+  ],
+  "advisory_refused": [
+    {
+      "query": "Should I invest in HDFC Mid Cap Fund?",
+      "expected_intent": "investment_advice",
+      "should_allow": false,
+      "reason": "advisory request"
+    },
+    {
+      "query": "Which fund is better: HDFC Mid Cap or HDFC Equity?",
+      "expected_intent": "comparison",
+      "should_allow": false,
+      "reason": "comparison request"
+    },
+    {
+      "query": "Can you recommend a good mutual fund?",
+      "expected_intent": "investment_advice",
+      "should_allow": false,
+      "reason": "recommendation request"
+    },
+    {
+      "query": "What is the best performing HDFC fund?",
+      "expected_intent": "ranking",
+      "should_allow": false,
+      "reason": "ranking request"
+    },
+    {
+      "query": "What will be my returns after 5 years?",
+      "expected_intent": "return_projection",
+      "should_allow": false,
+      "reason": "return projection request"
+    },
+    {
+      "query": "Calculate my SIP returns for 10000 per month",
+      "expected_intent": "performance_calculation",
+      "should_allow": false,
+      "reason": "performance calculation request"
+    }
+  ],
+  "sensitive_data_rejected": [
+    {
+      "query": "What is my PAN number?",
+      "sensitive_type": "pan",
+      "should_allow": false
+    },
+    {
+      "query": "Can you verify my Aadhaar?",
+      "sensitive_type": "aadhaar",
+      "should_allow": false
+    },
+    {
+      "query": "What is my account number?",
+      "sensitive_type": "account_number",
+      "should_allow": false
+    },
+    {
+      "query": "What is my OTP?",
+      "sensitive_type": "otp",
+      "should_allow": false
+    },
+    {
+      "query": "What is my registered email?",
+      "sensitive_type": "email",
+      "should_allow": false
+    },
+    {
+      "query": "What is my phone number?",
+      "sensitive_type": "phone",
+      "should_allow": false
+    }
+  ],
+  "missing_information": [
+    {
+      "query": "Who is the fund manager of HDFC Mid Cap?",
+      "note": "May not be in corpus, should return 'not found' message"
+    },
+    {
+      "query": "What is the dividend history?",
+      "note": "May not be in corpus, should return 'not found' message"
+    }
+  ],
+  "response_contract_examples": {
+    "valid_answer": "The HDFC Mid Cap Fund has an expense ratio of 0.73%. This is a direct plan growth option with no distributor commissions. Source: https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth\nLast updated from sources: 2026-05-29",
+    "invalid_too_many_sentences": "The expense ratio is 0.73%. It is a direct plan. It has good returns. You should invest. Source: https://groww.in/link\nLast updated from sources: 2026-05-29",
+    "invalid_no_source": "The expense ratio is 0.73%. This is a direct plan.\nLast updated from sources: 2026-05-29",
+    "invalid_no_footer": "The expense ratio is 0.73%. This is a direct plan. Source: https://groww.in/link",
+    "invalid_multiple_sources": "See https://groww.in/link1 and https://groww.in/link2 for details.\nLast updated from sources: 2026-05-29"
+  }
+}

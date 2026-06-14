@@ -1,0 +1,66 @@
+# Canonical source catalog for the facts-only mutual fund FAQ assistant.
+# Hard rule: these five Groww URLs are the entire corpus for this project.
+# Do not add AMC, AMFI, SEBI, third-party, or extra Groww URLs.
+
+amc:
+  name: HDFC Mutual Fund
+  reference_context: Groww scheme pages
+
+schemes:
+  - id: hdfc-mid-cap-direct-growth
+    name: HDFC Mid Cap Fund - Direct Growth
+    category: Mid Cap
+  - id: hdfc-equity-direct-growth
+    name: HDFC Equity Fund - Direct Growth
+    category: Flexi Cap
+  - id: hdfc-focused-direct-growth
+    name: HDFC Focused Fund - Direct Growth
+    category: Focused
+  - id: hdfc-elss-tax-saver-direct-plan-growth
+    name: HDFC ELSS Tax Saver - Direct Plan Growth
+    category: ELSS
+  - id: hdfc-large-cap-direct-growth
+    name: HDFC Large Cap Fund - Direct Growth
+    category: Large Cap
+
+sources:
+  - id: hdfc-mid-cap-direct-growth-groww
+    title: HDFC Mid Cap Fund - Direct Growth
+    page_title: HDFC Mid Cap Fund Direct Growth
+    url: https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth
+    type: groww_scheme_page
+    scheme_id: hdfc-mid-cap-direct-growth
+    allowed: true
+    last_checked: 2026-05-29
+  - id: hdfc-equity-direct-growth-groww
+    title: HDFC Equity Fund - Direct Growth
+    page_title: HDFC Flexi Cap Direct Plan Growth
+    url: https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth
+    type: groww_scheme_page
+    scheme_id: hdfc-equity-direct-growth
+    allowed: true
+    last_checked: 2026-05-29
+  - id: hdfc-focused-direct-growth-groww
+    title: HDFC Focused Fund - Direct Growth
+    page_title: HDFC Focused Fund Direct Growth
+    url: https://groww.in/mutual-funds/hdfc-focused-fund-direct-growth
+    type: groww_scheme_page
+    scheme_id: hdfc-focused-direct-growth
+    allowed: true
+    last_checked: 2026-05-29
+  - id: hdfc-elss-tax-saver-direct-plan-growth-groww
+    title: HDFC ELSS Tax Saver - Direct Plan Growth
+    page_title: HDFC ELSS Tax Saver Fund Direct Plan Growth
+    url: https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth
+    type: groww_scheme_page
+    scheme_id: hdfc-elss-tax-saver-direct-plan-growth
+    allowed: true
+    last_checked: 2026-05-29
+  - id: hdfc-large-cap-direct-growth-groww
+    title: HDFC Large Cap Fund - Direct Growth
+    page_title: HDFC Large Cap Fund Direct Growth
+    url: https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth
+    type: groww_scheme_page
+    scheme_id: hdfc-large-cap-direct-growth
+    allowed: true
+    last_checked: 2026-05-29
