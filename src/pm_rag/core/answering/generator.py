@@ -24,17 +24,18 @@ _FUND_PATTERNS = [
 
 
 # Fallback: extract answer from chunks when LLM fails
+# Chunk text uses \n as separator, so patterns use [\s\S] to match across lines
 _FALLBACK_PATTERNS = {
-    "expense": re.compile(r'expense\s+ratio[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
-    "ratio": re.compile(r'(?:expense|fee|charge)[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
-    "sip": re.compile(r'(?:minimum|minimum\s+SIP|SIP\s+Investment)[^.]*₹\s*\d+', re.IGNORECASE),
-    "minimum": re.compile(r'(?:minimum|smallest)[^.]*₹\s*\d+', re.IGNORECASE),
-    "exit": re.compile(r'exit\s+load[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
-    "load": re.compile(r'(?:exit|redemption)[^.]*\d+\.?\d*\s*%', re.IGNORECASE),
-    "lock": re.compile(r'lock[- ]?in\s+period[^.]*\d+\s*(?:year|month)', re.IGNORECASE),
-    "risk": re.compile(r'(?:risk|riskometer)[^.]*\b(?:Low|Moderate|High|Very High)\b', re.IGNORECASE),
-    "benchmark": re.compile(r'benchmark[^.]*\b[A-Z][^.,]+(?:Index|index)', re.IGNORECASE),
-    "type": re.compile(r'(?:type|category|classified)[^.]*\b(?:Equity|Debt|Hybrid|Mid Cap|Large Cap|Small Cap)\b', re.IGNORECASE),
+    "expense": re.compile(r'Expense ratio\n([\d.]+%)', re.IGNORECASE),
+    "ratio": re.compile(r'Expense ratio\n([\d.]+%)', re.IGNORECASE),
+    "sip": re.compile(r'Min\. for SIP\n(₹[\d,]+)', re.IGNORECASE),
+    "minimum": re.compile(r'Min\. for SIP\n(₹[\d,]+)', re.IGNORECASE),
+    "exit": re.compile(r'[Ee]xit [Ll]oad\n?(?:of )?([\d.]+%[\s\S]*?)(?:\n\w|\Z)', re.IGNORECASE),
+    "lock": re.compile(r'lock[- ]?in\s+period\n?(\d+\s*(?:year|month)s?)', re.IGNORECASE),
+    "risk": re.compile(r'(Very High|High|Moderate|Low)\s*\n\s*Risk', re.IGNORECASE),
+    "benchmark": re.compile(r'(?:Benchmark|benchmark)\n([^\n]+)', re.IGNORECASE),
+    "type": re.compile(r'\n(Equity|Debt|Hybrid)\n(?:Mid Cap|Large Cap|Small Cap|Flexi Cap|ELSS)', re.IGNORECASE),
+    "category": re.compile(r'\n(?:Equity|Debt|Hybrid)\n(Mid Cap|Large Cap|Small Cap|Flexi Cap|ELSS)', re.IGNORECASE),
 }
 
 
@@ -42,30 +43,54 @@ def _extract_from_chunks(query: str, chunks: List[Dict]) -> str:
     """Extract answer from chunks when LLM returns 'not found'."""
     query_lower = query.lower()
     
-    # Find matching pattern based on query keywords
-    for keyword, pattern in _FALLBACK_PATTERNS.items():
-        if keyword in query_lower:
-            # Search all chunks for matching sentence
-            for chunk in chunks:
-                text = chunk.get("text", "")
-                match = pattern.search(text)
-                if match:
-                    # Return the matched sentence (clean it up)
-                    sentence = match.group(0).strip()
-                    # Ensure it's a complete sentence
-                    if not sentence.endswith("."):
-                        # Find the end of the sentence
-                        end = text.find(".", match.end())
-                        if end != -1:
-                            sentence = text[match.start():end+1]
-                    return sentence
+    # Map query keywords to fallback pattern keys
+    keyword_map = {
+        "expense": "expense", "fee": "expense", "charge": "expense",
+        "ratio": "ratio", "ter": "ratio",
+        "sip": "sip", "minimum": "minimum", "min": "sip",
+        "exit": "exit", "load": "exit", "redemption": "exit",
+        "lock": "lock", "elss": "lock",
+        "risk": "risk", "riskometer": "risk", "risky": "risk",
+        "benchmark": "benchmark", "index": "benchmark",
+        "type": "type", "category": "category", "kind": "type",
+        "classify": "category", "classified": "category",
+    }
     
-    # Generic fallback: return first sentence of top chunk
-    if chunks:
-        text = chunks[0].get("text", "")
-        sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', text) if s.strip()]
-        if sentences:
-            return sentences[0]
+    # Find the best matching pattern key
+    pattern_key = None
+    for kw in keyword_map:
+        if kw in query_lower:
+            pattern_key = keyword_map[kw]
+            break
+    
+    if pattern_key and pattern_key in _FALLBACK_PATTERNS:
+        pattern = _FALLBACK_PATTERNS[pattern_key]
+        for chunk in chunks:
+            text = chunk.get("text", "")
+            match = pattern.search(text)
+            if match:
+                value = match.group(1).strip()
+                scheme = chunk.get("metadata", {}).get("scheme", "this fund")
+                
+                # Build a natural sentence based on the query type
+                if pattern_key in ("expense", "ratio"):
+                    return f"The {scheme} has an expense ratio of {value}."
+                elif pattern_key in ("sip", "minimum"):
+                    return f"The {scheme} has a minimum SIP investment of {value}."
+                elif pattern_key == "exit":
+                    return f"The {scheme} has an exit load of {value}."
+                elif pattern_key == "lock":
+                    return f"The {scheme} has a lock-in period of {value}."
+                elif pattern_key == "risk":
+                    return f"The {scheme} has a {value} risk level."
+                elif pattern_key == "benchmark":
+                    return f"The {scheme} tracks the {value}."
+                elif pattern_key == "type":
+                    return f"The {scheme} is an {value} mutual fund scheme."
+                elif pattern_key == "category":
+                    return f"The {scheme} is classified as a {value} fund."
+                else:
+                    return f"The {scheme}: {value}."
     
     return ""
 
