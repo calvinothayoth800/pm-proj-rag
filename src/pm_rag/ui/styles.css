@@ -493,7 +493,7 @@ button:disabled {
 
 .sidebar-tab .tab-category {
     font-size: 0.74rem;
-    color: #555555;
+    color: #000000;
     margin-top: 3px;
     font-weight: 500;
 }
@@ -505,7 +505,7 @@ button:disabled {
 .fund-tab {
     background: transparent;
     border: 1px solid var(--line);
-    color: var(--muted);
+    color: #000000;
     font-size: 0.86rem;
     font-weight: 700;
     padding: 7px 15px;

@@ -24,7 +24,7 @@
             },
             "issues": []
           },
-          "elapsed": 21.69867777824402
+          "elapsed": 87.96004438400269
         },
         {
           "query": "What is the minimum SIP amount?",
@@ -43,7 +43,7 @@
             },
             "issues": []
           },
-          "elapsed": 3.0444610118865967
+          "elapsed": 2.2349884510040283
         },
         {
           "query": "What is the exit load?",
@@ -62,7 +62,7 @@
             },
             "issues": []
           },
-          "elapsed": 2.513979434967041
+          "elapsed": 2.3291049003601074
         },
         {
           "query": "What is the lock-in period for ELSS?",
@@ -81,7 +81,7 @@
             },
             "issues": []
           },
-          "elapsed": 7.986938714981079
+          "elapsed": 8.887334823608398
         },
         {
           "query": "What type of fund is HDFC Mid Cap?",
@@ -99,7 +99,7 @@
             },
             "issues": []
           },
-          "elapsed": 12.065200328826904
+          "elapsed": 4.002225160598755
         },
         {
           "query": "What is the risk level?",
@@ -117,7 +117,7 @@
             },
             "issues": []
           },
-          "elapsed": 14.523621559143066
+          "elapsed": 2.6796231269836426
         },
         {
           "query": "What is the benchmark index?",
@@ -135,7 +135,7 @@
             },
             "issues": []
           },
-          "elapsed": 13.499500274658203
+          "elapsed": 11.960756540298462
         }
       ]
     },
@@ -158,7 +158,7 @@
             },
             "issues": []
           },
-          "elapsed": 0.014000892639160156
+          "elapsed": 0.011996030807495117
         },
         {
           "query": "Which is better: HDFC Mid Cap or HDFC Large Cap?",
@@ -175,7 +175,7 @@
             },
             "issues": []
           },
-          "elapsed": 0.013994932174682617
+          "elapsed": 0.08259248733520508
         },
         {
           "query": "What returns will I get in 5 years?",
@@ -192,7 +192,7 @@
             },
             "issues": []
           },
-          "elapsed": 0.014000177383422852
+          "elapsed": 0.012003898620605469
         },
         {
           "query": "Is this the best mid cap fund?",
@@ -209,7 +209,7 @@
             },
             "issues": []
           },
-          "elapsed": 0.012000560760498047
+          "elapsed": 0.010996818542480469
         }
       ]
     },
@@ -233,7 +233,7 @@
             },
             "issues": []
           },
-          "elapsed": 10.798739671707153
+          "elapsed": 12.013274431228638
         },
         {
           "query": "How do I check my account balance?",
@@ -251,7 +251,7 @@
             },
             "issues": []
           },
-          "elapsed": 14.207488298416138
+          "elapsed": 15.064794540405273
         }
       ]
     },
@@ -275,7 +275,7 @@
             },
             "issues": []
           },
-          "elapsed": 10.887210369110107
+          "elapsed": 10.205018281936646
         },
         {
           "query": "What about SBI Mutual Fund?",
@@ -293,7 +293,7 @@
             },
             "issues": []
           },
-          "elapsed": 11.823459386825562
+          "elapsed": 11.124043941497803
         },
         {
           "query": "What is the expense ratio and exit load and minimum SIP?",
@@ -311,7 +311,7 @@
             },
             "issues": []
           },
-          "elapsed": 11.015181303024292
+          "elapsed": 11.485658168792725
         },
         {
           "query": "What is the expens ratio?",
@@ -328,7 +328,7 @@
             },
             "issues": []
           },
-          "elapsed": 19.561692476272583
+          "elapsed": 18.72022318840027
         },
         {
           "query": "Tell me about Bitcoin",
@@ -346,7 +346,7 @@
             },
             "issues": []
           },
-          "elapsed": 10.347339391708374
+          "elapsed": 11.713045597076416
         }
       ]
     }
