@@ -130,12 +130,20 @@ document.addEventListener("DOMContentLoaded", () => {
             appendMessageHTML(msg.text, msg.isUser);
         });
         
-        // Update sidebar and sub-headers
+        // Update sidebar details with a premium fade transition
         const meta = fundsMetadata[activeSchemeId];
-        if (meta) {
-            document.querySelector(".context-panel h2").textContent = meta.name;
-            document.querySelector(".context-description").textContent = meta.description;
-            document.querySelector(".logo p").textContent = `${meta.category} \u2022 Facts only`;
+        const detailsCard = document.getElementById("schemeDetails");
+        if (meta && detailsCard) {
+            detailsCard.classList.add("fade-out");
+            
+            setTimeout(() => {
+                document.getElementById("schemeDetailTitle").textContent = meta.name;
+                document.getElementById("schemeDetailDesc").textContent = meta.description;
+                document.getElementById("schemeGrowwLink").href = meta.url;
+                document.querySelector(".logo p").textContent = `${meta.category} \u2022 Facts only`;
+                
+                detailsCard.classList.remove("fade-out");
+            }, 150);
         }
     }
 

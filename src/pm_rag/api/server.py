@@ -77,4 +77,11 @@ def serve_ui():
     index_path = os.path.join(ui_dir, "index.html")
     if not os.path.exists(index_path):
         raise HTTPException(status_code=404, detail="UI not found")
-    return FileResponse(index_path)
+    return FileResponse(
+        index_path,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
+    )

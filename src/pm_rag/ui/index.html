@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mutual Fund FAQ Assistant</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css?v=1.0.5">
 </head>
 <body>
     <div class="app-shell">
@@ -46,6 +49,19 @@
                         <span class="tab-name">HDFC Large Cap</span>
                         <span class="tab-category">Equity Large Cap</span>
                     </button>
+                </div>
+
+                <!-- Dynamic Scheme Details Card -->
+                <div class="scheme-details" id="schemeDetails">
+                    <h3 class="scheme-detail-title" id="schemeDetailTitle">HDFC Mid Cap Fund</h3>
+                    <p class="scheme-detail-desc" id="schemeDetailDesc">An equity mutual fund scheme investing predominantly in mid-cap companies. Aimed at generating long-term capital appreciation.</p>
+                    <a href="https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth" target="_blank" rel="noopener" class="scheme-groww-link" id="schemeGrowwLink">
+                        <span>View on Groww</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </a>
                 </div>
 
                 <div class="policy-strip">
@@ -117,6 +133,6 @@
             </main>
         </section>
     </div>
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=1.0.5"></script>
 </body>
 </html>

@@ -137,7 +137,7 @@ def generate_answer(query: str, retrieved_chunks: List[Dict]) -> Tuple[str, str,
         raw_answer = sentences[0] if sentences else "Information not found in the fixed Groww corpus."
     else:
         try:
-            client = Groq(api_key=api_key)
+            client = Groq(api_key=api_key, timeout=10.0)
             completion = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
@@ -146,7 +146,12 @@ def generate_answer(query: str, retrieved_chunks: List[Dict]) -> Tuple[str, str,
             )
             raw_answer = completion.choices[0].message.content
         except Exception as e:
-            raw_answer = f"Error during generation: {str(e)}"
+            # Try to extract the factual answer from chunks directly on API error/rate-limit
+            extracted = _extract_from_chunks(query, retrieved_chunks)
+            if extracted:
+                raw_answer = extracted
+            else:
+                raw_answer = f"Error during generation: {str(e)}"
     
     # If LLM returned "not found", try extracting from chunks directly
     if "information not found" in raw_answer.lower() or "not found" in raw_answer.lower():
