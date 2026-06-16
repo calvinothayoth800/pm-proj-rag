@@ -464,6 +464,7 @@ button:disabled {
     overflow: hidden;
     width: 100%;
     height: auto;
+    color: var(--ink);
 }
 
 .sidebar-tab:hover {
