@@ -90,23 +90,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // Delay status check to avoid blocking initial load
     setTimeout(checkAPIStatus, 1000);
 
-    // Handle fund selector tab clicks
-    const fundTabs = document.querySelectorAll(".fund-tab");
-    fundTabs.forEach(tab => {
+    // Select fund and sync both top and sidebar selector active states
+    function selectFund(schemeId, force = false) {
+        if (activeSchemeId === schemeId && !force) return;
+        
+        activeSchemeId = schemeId;
+        
+        // Sync both sidebar tabs and top horizontal tabs active states
+        document.querySelectorAll(".sidebar-tab, .fund-tab").forEach(tab => {
+            const tabScheme = tab.getAttribute("data-scheme");
+            if (tabScheme === activeSchemeId) {
+                tab.classList.add("active");
+                tab.setAttribute("aria-selected", "true");
+            } else {
+                tab.classList.remove("active");
+                tab.setAttribute("aria-selected", "false");
+            }
+        });
+        
+        renderActiveChat();
+    }
+
+    // Handle clicks on top horizontal tabs and sidebar tabs
+    document.querySelectorAll(".sidebar-tab, .fund-tab").forEach(tab => {
         tab.addEventListener("click", () => {
-            if (tab.classList.contains("active")) return;
-            
-            // Toggle active tabs
-            fundTabs.forEach(t => {
-                t.classList.remove("active");
-                t.setAttribute("aria-selected", "false");
-            });
-            tab.classList.add("active");
-            tab.setAttribute("aria-selected", "true");
-            
-            // Switch active scheme
-            activeSchemeId = tab.getAttribute("data-scheme");
-            renderActiveChat();
+            const schemeId = tab.getAttribute("data-scheme");
+            selectFund(schemeId);
         });
     });
 
@@ -227,6 +236,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Initial render
-    renderActiveChat();
+    selectFund(activeSchemeId, true);
     queryInput.focus();
 });
