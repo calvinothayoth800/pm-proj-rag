@@ -173,6 +173,8 @@ body {
 }
 
 .example-questions {
+    position: relative;
+    z-index: 10;
     padding: 14px 20px 14px;
     border-bottom: 1px solid var(--line);
     background: var(--panel);
@@ -325,6 +327,8 @@ body {
 }
 
 .input-area {
+    position: relative;
+    z-index: 10;
     padding: 16px 20px 20px;
     background: var(--panel);
     border-top: 1px solid var(--line);
@@ -418,6 +422,8 @@ button:disabled {
 }
 
 .fund-tabs {
+    position: relative;
+    z-index: 10;
     display: flex;
     background: var(--panel-soft);
     border-bottom: 1px solid var(--line);
