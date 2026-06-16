@@ -8,6 +8,62 @@ document.addEventListener("DOMContentLoaded", () => {
     // Use relative API path (works in HF Spaces iframe)
     const API_URL = "/api/chat";
 
+    // Funds metadata for dynamic sidebar and title updates
+    const fundsMetadata = {
+        "hdfc-mid-cap-direct-growth": {
+            name: "HDFC Mid Cap Fund",
+            category: "Equity Mid Cap",
+            description: "An equity mutual fund scheme investing predominantly in mid-cap companies. Aimed at generating long-term capital appreciation.",
+            url: "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth"
+        },
+        "hdfc-equity-direct-growth": {
+            name: "HDFC Flexi Cap Fund",
+            category: "Equity Flexi Cap",
+            description: "A flexible equity scheme investing across large-cap, mid-cap, and small-cap stocks, allowing dynamic portfolio adjustments.",
+            url: "https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth"
+        },
+        "hdfc-focused-direct-growth": {
+            name: "HDFC Focused Fund",
+            category: "Equity Focused",
+            description: "A focused portfolio investing in a limited number of high-conviction companies (maximum 30) across market capitalizations.",
+            url: "https://groww.in/mutual-funds/hdfc-focused-fund-direct-growth"
+        },
+        "hdfc-elss-tax-saver-direct-plan-growth": {
+            name: "HDFC ELSS Tax Saver Fund",
+            category: "Equity ELSS",
+            description: "An Equity Linked Savings Scheme (ELSS) providing tax deduction benefits under Section 80C with a mandatory 3-year lock-in period.",
+            url: "https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth"
+        },
+        "hdfc-large-cap-direct-growth": {
+            name: "HDFC Large Cap Fund",
+            category: "Equity Large Cap",
+            description: "A large-cap equity scheme investing primarily in established, blue-chip market leaders with stable growth profiles.",
+            url: "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth"
+        }
+    };
+
+    // Active fund state
+    let activeSchemeId = "hdfc-mid-cap-direct-growth";
+
+    // Chat history state per fund
+    const chatHistories = {
+        "hdfc-mid-cap-direct-growth": [
+            { text: "Hi! I can answer questions about the HDFC Mid Cap Fund. Try clicking an example chip or type your question!", isUser: false }
+        ],
+        "hdfc-equity-direct-growth": [
+            { text: "Hi! I can answer questions about the HDFC Flexi Cap Fund. Try clicking an example chip or type your question!", isUser: false }
+        ],
+        "hdfc-focused-direct-growth": [
+            { text: "Hi! I can answer questions about the HDFC Focused Fund. Try clicking an example chip or type your question!", isUser: false }
+        ],
+        "hdfc-elss-tax-saver-direct-plan-growth": [
+            { text: "Hi! I can answer questions about the HDFC ELSS Tax Saver Fund. Try clicking an example chip or type your question!", isUser: false }
+        ],
+        "hdfc-large-cap-direct-growth": [
+            { text: "Hi! I can answer questions about the HDFC Large Cap Fund. Try clicking an example chip or type your question!", isUser: false }
+        ]
+    };
+
     // Check API status on load
     async function checkAPIStatus() {
         try {
@@ -34,6 +90,46 @@ document.addEventListener("DOMContentLoaded", () => {
     // Delay status check to avoid blocking initial load
     setTimeout(checkAPIStatus, 1000);
 
+    // Handle fund selector tab clicks
+    const fundTabs = document.querySelectorAll(".fund-tab");
+    fundTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            if (tab.classList.contains("active")) return;
+            
+            // Toggle active tabs
+            fundTabs.forEach(t => {
+                t.classList.remove("active");
+                t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("active");
+            tab.setAttribute("aria-selected", "true");
+            
+            // Switch active scheme
+            activeSchemeId = tab.getAttribute("data-scheme");
+            renderActiveChat();
+        });
+    });
+
+    // Render active chat and sidebar details
+    function renderActiveChat() {
+        // Clear chat container
+        chatContainer.innerHTML = "";
+        
+        // Render message history for the active fund
+        const history = chatHistories[activeSchemeId] || [];
+        history.forEach(msg => {
+            appendMessageHTML(msg.text, msg.isUser);
+        });
+        
+        // Update sidebar and sub-headers
+        const meta = fundsMetadata[activeSchemeId];
+        if (meta) {
+            document.querySelector(".context-panel h2").textContent = meta.name;
+            document.querySelector(".context-description").textContent = meta.description;
+            document.querySelector(".logo p").textContent = `${meta.category} \u2022 Facts only`;
+        }
+    }
+
     // Handle example question clicks
     document.querySelectorAll(".example-chip").forEach(chip => {
         chip.addEventListener("click", () => {
@@ -43,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    function appendMessage(text, isUser = false) {
+    function appendMessageHTML(text, isUser = false) {
         const msgDiv = document.createElement("div");
         msgDiv.className = `message ${isUser ? "user-message" : "system-message"}`;
         
@@ -70,6 +166,15 @@ document.addEventListener("DOMContentLoaded", () => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
         
         return msgDiv;
+    }
+
+    function appendMessage(text, isUser = false) {
+        // Save to active chat history
+        if (!chatHistories[activeSchemeId]) {
+            chatHistories[activeSchemeId] = [];
+        }
+        chatHistories[activeSchemeId].push({ text, isUser });
+        return appendMessageHTML(text, isUser);
     }
 
     function showLoading() {
@@ -101,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({ query, scheme_id: activeSchemeId })
             });
             const data = await res.json();
             
@@ -121,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Focus input on load
+    // Initial render
+    renderActiveChat();
     queryInput.focus();
 });

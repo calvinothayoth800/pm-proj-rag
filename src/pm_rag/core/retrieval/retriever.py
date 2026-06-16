@@ -16,14 +16,10 @@ def retrieve(
     use_keyword: bool = True,
     use_cross_encoder: bool = True,
     target_scheme: Optional[str] = None,
+    intent: Optional[str] = None,
 ) -> List[Dict]:
     """
     Hybrid retrieval: combines FAISS vector search, BM25 keyword search, and cross-encoder reranking.
-    
-    Architecture:
-    1. FAISS: Dense retrieval using BGE embeddings (semantic similarity)
-    2. BM25: Sparse retrieval using keyword matching (lexical similarity)
-    3. Cross-encoder: Reranking for precision (query-document relevance)
     
     Args:
         query: user query string
@@ -32,7 +28,8 @@ def retrieve(
         use_faiss: whether to use FAISS vector search
         use_keyword: whether to use BM25 keyword search
         use_cross_encoder: whether to use cross-encoder reranking
-        target_scheme: optional scheme to boost in re-ranking
+        target_scheme: optional scheme to boost in re-ranking / filter by
+        intent: optional classified intent to guide penalization
     
     Returns:
         List of result dicts with id, score, metadata, text, source_url, last_checked
@@ -43,9 +40,14 @@ def retrieve(
     if use_faiss:
         try:
             index_data = load_faiss_index(index_dir)
-            faiss_results = faiss_search(query, index_data, top_k=top_k * 2)
+            search_k = index_data["index"].ntotal if target_scheme else top_k * 2
+            faiss_results = faiss_search(query, index_data, top_k=search_k)
             
             for idx_pos, sim_score in faiss_results:
+                if target_scheme:
+                    meta = index_data["metadatas"][idx_pos]
+                    if meta.get("scheme_id") != target_scheme:
+                        continue
                 # FAISS cosine similarity ranges [-1, 1], normalize to [0, 1]
                 normalized_score = (sim_score + 1) / 2
                 scores_by_idx[idx_pos] = scores_by_idx.get(idx_pos, 0) + normalized_score * 0.6
@@ -74,6 +76,10 @@ def retrieve(
                 
                 kw_results = keyword_search(query, entries)
                 for idx_val, kw_score in kw_results:
+                    if target_scheme:
+                        meta = entries[idx_val]["metadata"]
+                        if meta.get("scheme_id") != target_scheme:
+                            continue
                     scores_by_idx[idx_val] = scores_by_idx.get(idx_val, 0) + kw_score * 0.4
         except Exception as e:
             print(f"Warning: Keyword search failed: {e}")
@@ -82,11 +88,24 @@ def retrieve(
     try:
         index_data = load_faiss_index(index_dir)
         results = []
+        
+        # Check if query is looking for factual numbers vs general definitions
+        is_factual_query = any(w in query.lower() for w in ["expense", "ratio", "load", "sip", "minimum", "lock", "risk", "benchmark"])
+        is_definition_request = any(w in query.lower() for w in ["mean", "define", "definition", "meaning", "what is a ", "explain"])
+        should_penalize_definitions = (intent in [
+            "expense_ratio", "exit_load", "minimum_sip", 
+            "minimum_investment", "lock_in_period", "riskometer", "benchmark"
+        ]) or (is_factual_query and not is_definition_request)
+        
         for idx_val, combined_score in scores_by_idx.items():
             meta = index_data["metadatas"][idx_val]
             text = index_data["texts"][idx_val]
             chunk_id = index_data["chunk_ids"][idx_val]
             
+            # Penalize definition chunks for factual queries to favor actual numeric values
+            if should_penalize_definitions and "understand terms" in text.lower():
+                combined_score -= 10.0
+                
             results.append({
                 "id": chunk_id,
                 "score": combined_score,
@@ -98,6 +117,9 @@ def retrieve(
     except Exception as e:
         print(f"Error building results: {e}")
         return []
+    
+    # Sort after applying target_scheme filters and penalties
+    results = sorted(results, key=lambda x: x["score"], reverse=True)
     
     # 4. Cross-Encoder Reranking (if enabled and enough results)
     if use_cross_encoder and len(results) > 1:

@@ -1,3 +1,4 @@
+from typing import Optional
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +13,7 @@ app = FastAPI(title="PM RAG API")
 
 class QueryRequest(BaseModel):
     query: str
+    scheme_id: Optional[str] = None
 
 class QueryResponse(BaseModel):
     answer: str
@@ -51,7 +53,7 @@ def chat_endpoint(request: QueryRequest):
         )
 
     # 4. Retrieve
-    chunks = retrieve(query, top_k=5)
+    chunks = retrieve(query, top_k=5, target_scheme=request.scheme_id, intent=intent)
     
     # 5. Generate Answer
     raw_answer, src_url, last_checked = generate_answer(query, chunks)
