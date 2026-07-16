@@ -46,11 +46,11 @@ jobs:
     - name: Stage refreshed artifacts
       id: git-check
       run: |
-        git add data/processed/chunks-latest.json
-        git add data/processed/provenance-latest.json
-        git add data/indexes/faiss_index.bin
-        git add data/indexes/index.json
-        git add data/indexes/metadata.json
+        git add -f data/processed/chunks-latest.json
+        git add -f data/processed/provenance-latest.json
+        git add -f data/indexes/faiss_index.bin
+        git add -f data/indexes/index.json
+        git add -f data/indexes/metadata.json
 
         if [ -f "docs/handoff.md" ]; then
           sed -i "s/Latest run:.*/Latest run: $(date +%Y%m%d%H%M%S);/" docs/handoff.md
