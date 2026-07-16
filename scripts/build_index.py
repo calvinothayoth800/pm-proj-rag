@@ -7,13 +7,17 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from pm_rag.core.retrieval.faiss_index import build_faiss_index
+from pm_rag.core.retrieval.index import build_index
 
 
 def main() -> int:
     print("Building FAISS vector index...")
-    out = build_faiss_index()
-    print(f"[OK] Index built successfully at: {out}")
-    print(f"[OK] Use this index for fast vector similarity search")
+    out_faiss = build_faiss_index()
+    print(f"[OK] FAISS Index built successfully at: {out_faiss}")
+    
+    print("Building classic JSON index...")
+    out_classic = build_index()
+    print(f"[OK] Classic Index built successfully at: {out_classic}")
     return 0
 
 
