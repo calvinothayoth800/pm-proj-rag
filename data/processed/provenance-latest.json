@@ -1,15 +1,15 @@
 {
   "chunk_count": 84,
-  "chunk_sha256": "93f0407819050732e514870127938bd729fec363e15951c5ef67486fde0b63e3",
-  "created_at": "2026-08-10T00:57:25.714397Z",
+  "chunk_sha256": "bbe5aa201a0324a87243b072469eef3e328bda24235e7af9d268173186a18d06",
+  "created_at": "2026-08-17T00:39:10.887875Z",
   "failure_count": 0,
   "raw_snapshot_count": 5,
-  "run_id": "20260810005722",
+  "run_id": "20260817003908",
   "sources": [
-    "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
-    "https://groww.in/mutual-funds/hdfc-focused-fund-direct-growth",
-    "https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth",
     "https://groww.in/mutual-funds/hdfc-equity-fund-direct-growth",
-    "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth"
+    "https://groww.in/mutual-funds/hdfc-mid-cap-fund-direct-growth",
+    "https://groww.in/mutual-funds/hdfc-large-cap-fund-direct-growth",
+    "https://groww.in/mutual-funds/hdfc-elss-tax-saver-fund-direct-plan-growth",
+    "https://groww.in/mutual-funds/hdfc-focused-fund-direct-growth"
   ]
 }

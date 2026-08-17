@@ -25,7 +25,7 @@ Phase Status:
 - Phase 0: **IMPLEMENTED** - Foundation, docs, scaffold, edge-case tests (7 tests passing)
 - Phase 1: **IMPLEMENTED** - Fixed corpus validated as 5 exact Groww URLs in `configs/corpus.yaml` (7 tests passing)
 - Phase 2: **IMPLEMENTED** - Live ingestion pipeline with real scraped outputs (9 tests passing)
-  - Latest run: 20260810005809;
+  - Latest run: 20260817003955;
   - Artifacts: `data/raw/latest-manifest.json`, `data/processed/chunks-latest.json`
 - Phase 3: **IMPLEMENTED** - FAISS vector index with BGE embeddings + BM25 hybrid retrieval
   - FAISS IndexFlatIP (cosine similarity on 384-dim vectors)
